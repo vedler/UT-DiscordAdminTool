@@ -1,4 +1,4 @@
-# ut-webdev-jama
+# UT-DiscordAdminTool
 
 Projekti Wiki leiab siit:
 
