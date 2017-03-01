@@ -2,4 +2,4 @@
 
 Projekti Wiki leiab siit:
 
-https://github.com/vedler/ut-webdev-jama/wiki/Projektiplaan
+https://github.com/vedler/UT-DiscordAdminTool/wiki
