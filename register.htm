@@ -15,13 +15,12 @@
     <body>
 	<div class="container">
 
-      <form action="index.html" method="post">
+      <form action="/register" method="post" id="regform">
       
         <h1>Sign Up</h1>
         
-        <fieldset>
+        <fieldset form="regform">
           <legend></span>Your basic info</legend>
-	  <form>
           <label for="name">Account Name:</label>
           <input type="text" id="name" name="user_name"><br>
           
@@ -34,17 +33,18 @@
           <label for="password">Confirm Password:</label>
           <input type="password" id="password" name="user_password"><br>
         </fieldset>
-	</form>
+
+	  </form>
 	</div>
         
-        <fieldset>
+        <fieldset form="regform">
           <legend></span>Your profile</legend>
           <label for="bio">Biography:</label>
           <textarea id="bio" name="user_bio"></textarea>
         </fieldset>
         
-        <button type="submit">Sign Up</button>
-      </form>
+        <button form="regform" type="submit">Sign Up</button>
+      
       
     </body>
 </html>
