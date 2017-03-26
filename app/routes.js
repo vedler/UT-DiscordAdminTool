@@ -14,7 +14,14 @@ module.exports = function (app, passport) {
             user: req.user // get the user out of session and pass to template
         });
     });
-    
+
+
+    app.get('/test', checkAuthWithReturn, function (req, res) {
+        res.render('test.ejs', {
+            user: req.user // get the user out of session and pass to template
+        });
+    });
+
 
     // =====================================
     // LOGIN ===============================
@@ -28,8 +35,7 @@ module.exports = function (app, passport) {
 
     // process the login form
     app.post('/login', passport.authenticate('local-login', {
-        // TODO: Redirect to last page instead
-        //successRedirect: '/', // redirect to the secure profile section
+        //successRedirect: '/', // redirect to the secure profile section -- REPLACED with a "dynamic" selection of redirection path
         failureRedirect: '/login', // redirect back to the signup page if there is an error
         failureFlash: true // allow flash messages
     }),
@@ -43,9 +49,9 @@ module.exports = function (app, passport) {
             }
 
             // If redirection path is remembered, then use it to redirect
-            var redir = req.session.redirectTo ? req.session.redirectTo : '/';
+            var redirectTo = req.session.redirectTo ? req.session.redirectTo : '/';
             delete req.session.redirectTo;
-            res.redirect(redir);
+            res.redirect(redirectTo);
 
         });
 
@@ -60,6 +66,8 @@ module.exports = function (app, passport) {
 
     // process the signup form
     app.post('/register', passport.authenticate('local-register', {
+        // TODO: We dont want to return to some old page, because the page content should be user-specific, a new user would have no context anyway
+        // TODO: Later the authentication check should check for more than if the user is logged in or not (context access, permission levels etc.)
         successRedirect: '/', // redirect to the secure profile section
         failureRedirect: '/register', // redirect back to the signup page if there is an error
         failureFlash: true // allow flash messages
@@ -89,8 +97,8 @@ module.exports = function (app, passport) {
 // Check authentication without routing back to the requested page
 function checkAuth(req, res, next) {
     // if user is not authenticated in the session, redirect to login
-    if (!req.isAuthenticated()){
-		res.redirect('/login');
+    if (!req.isAuthenticated()) {
+        res.redirect('/login');
     } else {
         next();
     }
@@ -105,6 +113,4 @@ function checkAuthWithReturn(req, res, next) {
     } else {
         next();
     }
-
-    
 }
