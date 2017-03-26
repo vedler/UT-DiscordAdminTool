@@ -1,4 +1,5 @@
 // config/database.js
+// Dev database, whitelisted
 module.exports = {
     'connection': {
         'host': 'd42704.mysql.zonevs.eu',

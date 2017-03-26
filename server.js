@@ -1,7 +1,8 @@
 // server.js
 
-// set up ======================================================================
-// get all the tools we need
+// setup
+
+// dependencies
 var express = require('express');
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
@@ -14,9 +15,9 @@ var port = process.env.PORT || 8080;
 var passport = require('passport');
 var flash = require('connect-flash');
 
-// configuration ===============================================================
-// connect to our database
+// configuration 
 
+// connect to our database (done under the passport script)
 require('./config/passport')(passport); // pass passport for configuration
 
 // set up our express application
@@ -44,10 +45,10 @@ app.set('view engine', 'ejs'); // set up ejs for templating
 
 // required for passport
 app.use(session({
-    secret: 'vidyapathaisalwaysrunning',
+    secret: 'TFdZNtx3JY9bwKvr9TPRBJP7',
     resave: true,
     saveUninitialized: true
-})); // session secret
+}));
 
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
@@ -56,16 +57,11 @@ app.use(flash()); // use connect-flash for flash messages stored in session
 // i18n init parses req for language headers, cookies, etc.
 app.use(i18n.init);
 
-// Encoding
-/*app.use(function (req, res, next) {
-    res.header("Content-Type", "application/json; charset=utf-8");
-    next();
-});*/
-
-// routes ======================================================================
+// routes 
 require('./app/globalparams.js')(app, passport, i18n);
 require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
 
-// launch ======================================================================
+// start the app
 app.listen(port);
 console.log('The magic happens on port ' + port);
+
