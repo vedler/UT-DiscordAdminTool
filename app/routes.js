@@ -8,7 +8,8 @@ module.exports = function (app, passport) {
         res.render('index.ejs'); // load the index.ejs file
     });*/
 
-    app.get('/', isLoggedIn, function (req, res) {
+
+    app.get('/', checkAuthWithReturn, function (req, res) {
         res.render('index.ejs', {
             user: req.user // get the user out of session and pass to template
         });
@@ -19,7 +20,7 @@ module.exports = function (app, passport) {
     // LOGIN ===============================
     // =====================================
     // show the login form
-    app.get('/login', isLoggedIn, function (req, res) {
+    app.get('/login', function (req, res) {
 
         // render the page and pass in any flash data if it exists
         res.render('login.ejs', { message: req.flash('loginMessage') });
@@ -28,7 +29,7 @@ module.exports = function (app, passport) {
     // process the login form
     app.post('/login', passport.authenticate('local-login', {
         // TODO: Redirect to last page instead
-        successRedirect: '/', // redirect to the secure profile section
+        //successRedirect: '/', // redirect to the secure profile section
         failureRedirect: '/login', // redirect back to the signup page if there is an error
         failureFlash: true // allow flash messages
     }),
@@ -40,14 +41,19 @@ module.exports = function (app, passport) {
             } else {
                 req.session.cookie.expires = false;
             }
-            res.redirect('/');
+
+            // If redirection path is remembered, then use it to redirect
+            var redir = req.session.redirectTo ? req.session.redirectTo : '/';
+            delete req.session.redirectTo;
+            res.redirect(redir);
+
         });
 
     // =====================================
     // SIGNUP ==============================
     // =====================================
     // show the signup form
-    app.get('/register', isLoggedIn, function (req, res) {
+    app.get('/register', function (req, res) {
         // render the page and pass in any flash data if it exists
         res.render('register.ejs', { message: req.flash('registerMessage') });
     });
@@ -77,25 +83,28 @@ module.exports = function (app, passport) {
         req.logout();
         res.redirect('/');
     });
+
 };
 
-// route middleware to make sure
-function isLoggedIn(req, res, next) {
+// Check authentication without routing back to the requested page
+function checkAuth(req, res, next) {
     // if user is not authenticated in the session, redirect to login
     if (!req.isAuthenticated()){
-		if (req.path.includes('login') || req.path.includes('register')){
-			next();
-		} else {
-			req.session.redirectTo = req.path;
-			res.redirect('/login');
-		}
-	}
-	// otherwise carry on and can't force redirect in address bar to login nor register
-	else {
-		if (req.path.includes('login') || req.path.includes('register')){
-			res.redirect('/');
-		} else {
-			next();
-		}
+		res.redirect('/login');
+    } else {
+        next();
     }
+}
+
+// Check auth and remember where the user came from
+function checkAuthWithReturn(req, res, next) {
+    // If user is not authenticated and should return to current page
+    if (!req.isAuthenticated()) {
+        req.session.redirectTo = req.path;
+        res.redirect('/login');
+    } else {
+        next();
+    }
+
+    
 }

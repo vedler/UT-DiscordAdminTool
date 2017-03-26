@@ -1,0 +1,15 @@
+{
+	"Username": "Username",
+	"Pass": "Password",
+	"Remember_Me": "Remember Me",
+	"Login-Button": "Login",
+	"Register-Tooltip-Pre": "Need to register? ",
+	"Register-Tooltip-Link": "Register",
+	"Github-Tooltip-Pre": "Or check out our ",
+	"Github-Tooltip-Link": "GitHub",
+	"Signup-Button": "Sign Up",
+	"Login-Tooltip-Pre": "Already have an account? ",
+	"Login-Tooltip-Link": "Login",
+	"Register-Page-Title": "Register",
+	"Login-Page-Title": "Login"
+}
