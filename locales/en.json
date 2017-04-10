@@ -11,5 +11,6 @@
 	"Login-Tooltip-Pre": "Already have an account? ",
 	"Login-Tooltip-Link": "Login",
 	"Register-Page-Title": "Register",
-	"Login-Page-Title": "Login"
+	"Login-Page-Title": "Login",
+	"Facebook-login": "Login with facebook"
 }

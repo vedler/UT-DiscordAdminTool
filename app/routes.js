@@ -55,8 +55,8 @@ module.exports = function (app, passport) {
             }
 
             // If redirection path is remembered, then use it to redirect
-            var redirectTo = req.session.redirectTo ? req.session.redirectTo : '/';
-            delete req.session.redirectTo;
+            var redirectTo = req.session.autoRedirectTo ? req.session.autoRedirectTo : '/';
+            delete req.session.autoRedirectTo;
             res.redirect(redirectTo);
 
         });
@@ -81,7 +81,39 @@ module.exports = function (app, passport) {
         res.redirect('/');
     });
 
+    
+
+    // =====================================
+    // FACEBOOK ROUTES =====================
+    // =====================================
+    // route for facebook authentication and login
+    app.get('/auth/facebook', passport.authenticate('facebook', { scope: 'email' }));
+
+    // handle the callback after facebook has authenticated the user
+    app.get('/auth/facebook/callback',
+        passport.authenticate('facebook', {
+            successRedirect: '/',
+            failureRedirect: '/login'
+        }));
+
+    // route for logging out
+    app.get('/logout', function (req, res) {
+        req.logout();
+        res.redirect('/');
+    });
+
 };
+
+// route middleware to make sure a user is logged in
+function isLoggedIn(req, res, next) {
+
+    // if user is authenticated in the session, carry on
+    if (req.isAuthenticated())
+        return next();
+
+    // if they aren't redirect them to the home page
+    res.redirect('/');
+}
 
 // Check authentication without routing back to the requested page
 function checkAuth(req, res, next) {
@@ -97,7 +129,7 @@ function checkAuth(req, res, next) {
 function checkAuthWithReturn(req, res, next) {
     // If user is not authenticated and should return to current page
     if (!req.isAuthenticated()) {
-        req.session.redirectTo = req.path;
+        req.session.autoRedirectTo = req.path;
         res.redirect('/login');
     } else {
         next();

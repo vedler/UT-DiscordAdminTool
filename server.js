@@ -25,6 +25,12 @@ require('./config/passport')(passport); // pass passport for configuration
 app.use(morgan('dev')); // log every request to the console
 app.use(cookieParser()); // read cookies (needed for auth)
 
+
+
+
+
+
+
 app.use('/static', express.static(path.join(__dirname, 'static')))
 
 app.use(bodyParser.urlencoded({
@@ -67,3 +73,4 @@ require('./app/routes.js')(app, passport); // load our routes and pass in our ap
 // start the app
 app.listen(port);
 console.log('The magic happens on port ' + port);
+
