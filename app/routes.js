@@ -1,5 +1,5 @@
 // app/routes.js
-module.exports = function (app, passport) {
+module.exports = function (app, passport, ejs) {
 
     app.get('/', checkAuth, function (req, res) {
         res.render('index.ejs', {
@@ -79,6 +79,12 @@ module.exports = function (app, passport) {
     app.get('/logout', function (req, res) {
         req.logout();
         res.redirect('/');
+    });
+
+    app.get('/ajax-get-menu', function (req, res) {
+        
+        return res.render(getMenuTemplate(req.query.pageAction), getMenuData(req.query.pageAction, req.query.dataContext));
+        
     });
 
 };
