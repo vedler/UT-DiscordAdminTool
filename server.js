@@ -12,6 +12,9 @@ var morgan = require('morgan');
 var i18n = require('i18n');
 var app = express();
 var port = process.env.PORT || 8080;
+var ejs = require('ejs');
+
+var fs = require('fs');
 
 var passport = require('passport');
 var flash = require('connect-flash');
@@ -62,8 +65,11 @@ app.use(i18n.init);
 
 // routes 
 require('./app/globalparams.js')(app, passport, i18n);
-require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
+require('./app/routes.js')(app, passport, ejs); // load our routes and pass in our app and fully configured passport
+
+require('./app/menuloader.js')(app, passport, path, fs);
 
 // start the app
 app.listen(port);
 console.log('The magic happens on port ' + port);
+
