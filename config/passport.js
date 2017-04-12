@@ -10,7 +10,6 @@ var bcrypt = require('bcrypt-nodejs');
 var dbconfig = require('./database');
 var connection = mysql.createConnection(dbconfig.connection);
 var FacebookStrategy = require('passport-facebook').Strategy;
-var User = require('../app/models/user');
 
 // load the auth variables
 var configAuth = require('./auth');
@@ -18,38 +17,38 @@ var configAuth = require('./auth');
 connection.query('USE ' + dbconfig.database);
 // expose this function to our app using module.exports
 module.exports = function (passport) {
-    passport.serializeUser((user, done) => done(null, user));
-    passport.deserializeUser((user, done) => done(null, user));
     // used to serialize the user for the session
-    /*passport.serializeUser(function (user, done) {
-        done(null, user.id);
-    });
+    passport.serializeUser((user, done) => done(null, user.id));
 
     // used to deserialize the user
-    
     passport.deserializeUser(function (id, done) {
-        connection.query("SELECT * FROM users WHERE id = ? ", [id], function (err, rows) {
-            done(err, rows[0]);
-        });
-    });*/
-    /*passport.deserializeUser(function (id, done) {
-        User.findById(id, function (err, user) {
+        connection.query("SELECT * FROM users WHERE p_id = ? ", [id], function (err, rows) {
+
+            var user = {
+                id: rows[0].p_id.value,
+                provider: rows[0].provider.value,
+                name: rows[0].name.value,
+                password: rows[0].password.value,
+                token: rows[0].token.value,
+                email: rows[0].email.value
+            }
+
             done(err, user);
         });
-    });*/
+    });
 
     // Passport strategy for registration
     passport.use(
         'local-register',
         new LocalStrategy({
 
-            usernameField: 'username',
+            usernameField: 'name',
             passwordField: 'password',
             passReqToCallback: true
         },
             function (req, username, password, done) {
 
-                connection.query("SELECT * FROM users WHERE username = ?", [username], function (err, rows) {
+                connection.query("SELECT * FROM users WHERE name = ?", [username], function (err, rows) {
                     if (err)
                         return done(err);
                     if (rows.length) {
@@ -57,18 +56,22 @@ module.exports = function (passport) {
                         return done(null, false, req.flash('registerMessage', 'That username is already taken.'));
                     } else {
                         // This username is unique, create the user
-                        var newUserMysql = {
-                            username: username,
-                            // TODO: Different library for hashing
-                            password: bcrypt.hashSync(password, bcrypt.genSaltSync(), null)  // use the generateHash function in our user model
-                        };
 
-                        var insertQuery = "INSERT INTO users ( username, password ) values (?,?)";
+                        var user = {
+                            id: username.toLowerCase() + "-local",
+                            provider: 'local',
+                            name: username,
+                            password: bcrypt.hashSync(password, bcrypt.genSaltSync(), null),  // use the generateHash function in our user model,
+                            token: '',
+                            email: ''
+                        }
 
-                        connection.query(insertQuery, [newUserMysql.username, newUserMysql.password], function (err, rows) {
-                            newUserMysql.id = rows.insertId;
+                        var insertQuery = "INSERT INTO users ( name, password, p_id, provider, token ) values (?,?,?,?,?)";
 
-                            return done(null, newUserMysql);
+                        connection.query(insertQuery, [user.username, user.password, user.id, user.provider, ''], function (err, rows) {
+                            //newUserMysql.id = rows.insertId + '.' + user.provider;
+
+                            return done(null, user);
                         });
                     }
                 });
@@ -80,12 +83,12 @@ module.exports = function (passport) {
         'local-login',
         new LocalStrategy({
 
-            usernameField: 'username',
+            usernameField: 'name',
             passwordField: 'password',
             passReqToCallback: true
         },
             function (req, username, password, done) {
-                connection.query("SELECT * FROM users WHERE username = ?", [username], function (err, rows) {
+                connection.query("SELECT * FROM users WHERE name = ?", [username], function (err, rows) {
                     if (err)
                         return done(err);
                     if (!rows.length) {
@@ -93,52 +96,84 @@ module.exports = function (passport) {
                         return done(null, false, req.flash('loginMessage', 'No user found.'));
                     }
 
+                    var user = {
+                        id: rows[0].p_id.value,
+                        provider: rows[0].provider.value,
+                        name: rows[0].name.value,
+                        password: rows[0].password.value,
+                        token: rows[0].token.value,
+                        email: rows[0].email.value
+                    }
+
                     // User was found but is the password correct?
-                    if (!bcrypt.compareSync(password, rows[0].password))
+                    if (!bcrypt.compareSync(password, user.password))
                         return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
 
                     // all is well, return successful user
-                    return done(null, rows[0]);
+                    return done(null, user);
                 });
             })
     );
+
+
     passport.use(new FacebookStrategy({
 
         // pull in our app id and secret from our auth.js file
         clientID: configAuth.facebookAuth.clientID,
         clientSecret: configAuth.facebookAuth.clientSecret,
         callbackURL: configAuth.facebookAuth.callbackURL,
-        //profileFields": ["id", "birthday", "email", "first_name", "gender", "last_name"] (Might be useful later on)
+        profileFields: ["id", "emails", "name"]
     },
 
         // facebook will send back the token and profile
-        function (req, token, refreshToken, profile, done) {
+        function (accessToken, refreshToken, profile, done) {
+            
 
             /* asynchronous
             process.nextTick(function () {*/
-            connection.query("SELECT * FROM users WHERE token = ?", [token], function (err, newUser) {
-                if (err)
+            connection.query("SELECT * FROM users WHERE p_id = ?", [profile.id.toString() + '.' + 'facebook'], function (err, exUser) {
+                if (err) {
                     return done(err);
-                if (!newUser.length) {
-                    // No such user found, send a flash message
-                    var newUserMysql = {
-                        username: profile.name.givenName + ' ' + profile.name.familyName,
+                }
+
+                if (exUser.length != 0) {
+
+                    var user = {
+                        id: exUser[0].p_id.value,
+                        provider: exUser[0].provider.value,
+                        name: exUser[0].name.value,
+                        password: exUser[0].password.value,
+                        token: exUser[0].token.value,
+                        email: exUser[0].email.value
+                    }
+
+                    return (null, user);
+                } else {
+
+                    var user = {
+                        id: profile.id.toString() + '.' + 'facebook',
+                        provider: 'facebook',
+                        name: profile.name.givenName + '.' + profile.name.familyName + '.' + profile.id,
                         password: '',
-                        token: token
-                        // TODO: Different library for hashing
-                    };
+                        token: accessToken,
+                        email: profile.emails[0].value
+                    }
 
-                    var insertQuery = "INSERT INTO users ( username, password, token ) values (?, ?, ?)";
-                    //console.log('started from zero');
+                    var insertQuery = "INSERT INTO users ( name, password, p_id, email, token, provider ) values (?, ?, ?, ?, ?, ?)";
 
-                    connection.query(insertQuery, [newUserMysql.username, newUserMysql.password, newUserMysql.token], function (err, rows) {
-                        newUserMysql.id = rows.insertId;
-                        //console.log('now we here');
-                        return done(null, newUserMysql);
+                    connection.query(insertQuery, [user.name, '', user.id, user.email, accessToken, user.provider], function (err, rows) {
+
+                        if (err) {
+                            // TODO: Might not want this here
+                            console.log(err);
+                            return done(err);
+                        }
+
+                        //newUserMysql.id = rows.insertId;
+                        
+                        return done(null, user);
                     });
                 }
-                // all is well, return successful user
-                return done(null, newUser[0]);
             });
         })
     );

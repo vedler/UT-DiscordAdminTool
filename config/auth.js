@@ -4,8 +4,8 @@
 module.exports = {
 
     'facebookAuth' : {
-        'clientID': '1448474341890378', // your App ID
-        'clientSecret': 'c3297154de26c64717fea660933dff19', // your App Secret
+        'clientID': '1432679860122660', // your App ID
+        'clientSecret': 'e0a080a46c37e78f05a1caf74504c942', // your App Secret
         'callbackURL'   : 'http://utdiscord.localhost/auth/facebook/callback'
     },
 

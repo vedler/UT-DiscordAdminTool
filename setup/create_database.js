@@ -10,12 +10,17 @@ connection.query('DROP TABLE IF EXISTS `' + dbconfig.database + '`.`' + dbconfig
 connection.query('\
 CREATE TABLE `' + dbconfig.database + '`.`' + dbconfig.users_table + '` ( \
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT, \
-    `token` VARCHAR(200), \
-    `username` VARCHAR(20) NOT NULL, \
+    `p_id` VARCHAR(255) NOT NULL, \
+    `provider` VARCHAR(32) NOT NULL, \
+    `name` VARCHAR(64) NOT NULL, \
     `password` CHAR(60) NOT NULL, \
+    `token` VARCHAR(255), \
+    `email` CHAR(64), \
         PRIMARY KEY (`id`), \
     UNIQUE INDEX `id_UNIQUE` (`id` ASC), \
-    UNIQUE INDEX `username_UNIQUE` (`username` ASC) \
+    UNIQUE INDEX `name_UNIQUE` (`name` ASC), \
+    UNIQUE INDEX `p_id_UNIQUE` (`p_id` ASC), \
+    UNIQUE INDEX `email_UNIQUE` (`email` ASC) \
 )');
 
 console.log('Success: Database Created!')
