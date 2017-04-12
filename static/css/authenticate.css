@@ -1,0 +1,147 @@
+/*
+ * Style tweaks
+ * --------------------------------------------------
+ */
+ body {
+	padding-top: 80px;
+	background-color: #7389d5;
+ }
+
+ .col-sm-7 {
+	margin-left: 20%;
+	padding: 0px;
+	box-shadow: 0 0 20px #000;
+	display: flex;
+	border-radius: 3px;
+ }
+
+ .col-sm-2{
+	background-color: rgba(255,255,255,0.9);
+	flex: auto;
+	border-top-left-radius: 3px;
+	border-bottom-left-radius: 3px;
+ }
+
+ .col-sm-2 .name {
+ 	 text-align: center;
+	 padding-top: 50%;
+ }
+
+ .col-sm-5{
+	background-color: rgba(29,33,36,0.9);
+	flex: auto;
+	border-top-right-radius: 3px;
+	border-bottom-right-radius: 3px;
+ }
+
+ .col-sm-5 h1{
+	color: #ffffff;
+	text-align: center;
+ }
+
+ .col-sm-5 label{
+	color: #899098;
+	margin-bottom: 10px;
+ }
+
+.col-sm-5 p{
+	color: #899098;
+	font-size: 12px;
+	font-weight: bold;
+ }
+
+input[type=checkbox] {
+	margin: 0px;
+	margin-left: 5px;
+	width: 20px;
+	height: 20px;
+	display: inline;
+}
+
+ input[type=checkbox]:checked, input[type=checkbox]:focus  {
+	border-color: transparent;
+ 	outline: none;
+	box-shadow: none;
+ }
+
+ .form-input {
+	background-color: transparent;
+	border-color: transparent;
+	border-bottom-width: 2px;
+	border-bottom-color: #899098;
+	outline: none;
+	padding-left: 0px;
+    color: #ffffff;
+	box-shadow: none;
+    text-shadow: 0px 0px 0px #000;
+    font-size: 18px;
+ }
+
+ .form-input:focus {
+	border-color: transparent;
+	border-bottom-width: 2px;
+	border-bottom-color: #ffffff;
+	outline: none;
+	box-shadow: none;
+ }
+
+ input[type=text] {
+    color: #ffffff;
+}
+
+ hr {
+ 	 border-color: #899098;
+ }
+
+ .btn.btn-warning.btn-lg {
+	color: #ffffff;
+	margin-top: 20px;
+	background-color: #7389d5;
+	border-color: #7389d5;
+	border-radius: 3px;
+	margin-right: 5%;
+	margin-left: 5%;
+	width: 90%;
+	font-size: 16px;
+}
+
+ /*
+ * Off Canvas
+ * --------------------------------------------------
+ */
+@media screen and (max-width: 767px) {
+
+	html, body{
+		padding-top: 0px;
+		height: 100%;
+	}
+
+	.container{
+		padding-left: 5%;
+		padding-right: 5%;
+		height: 100%;
+	}
+
+	.col-sm-7 {
+		margin-left: 0px;
+		flex-direction: column;
+		height: 100%;
+	}
+
+	.col-sm-2{
+		background-color: rgba(29,33,36,0.9);
+		border-top-right-radius: 3px;
+		border-bottom-left-radius: 0px;
+		color: #ffffff;
+	}
+
+	.col-sm-2 .name{
+		padding: 0px;
+	}
+
+	.col-sm-5{
+		border-top-right-radius: 0px;
+		border-bottom-left-radius: 3px;
+	}
+
+}

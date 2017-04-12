@@ -5,45 +5,48 @@
     <title>Node Authentication</title>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
-    <style>
-        body {
-            padding-top: 80px;
-        }
-    </style>
+    <!-- Custom styles for this template -->
+    <link href="../static/css/authenticate.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
+		<div class="col-sm-7">
+			<div class="col-sm-2">
+				<div class="name">
+					<h2>Discord</h2>
+					<h2>Admin Tool</h2>
+				</div>
+			</div>
+			<div class="col-sm-5">
 
-        <div class="col-sm-6 col-sm-offset-3">
+				<h1><span class="fa fa-sign-in"></span> <%= __('Register-Page-Title') %></h1>
 
-            <h1><span class="fa fa-sign-in"></span> <%= __('Register-Page-Title') %></h1>
+				<!-- show any messages that come back with authentication -->
+				<% if (message.length > 0) { %>
+				<div class="alert alert-danger"><%= message %></div>
+				<% } %>
 
-            <!-- show any messages that come back with authentication -->
-            <% if (message.length > 0) { %>
-            <div class="alert alert-danger"><%= message %></div>
-            <% } %>
-
-            <!-- LOGIN FORM -->
-            <form action="/register" method="post">
-                <div class="form-group">
-                    <label><%= __('Username') %></label>
-                    <input type="text" class="form-control" name="username">
-                </div>
-                <div class="form-group">
-                    <label><%= __('Pass') %></label>
-                    <input type="password" class="form-control" name="password">
-                </div>
-
-                <button type="submit" class="btn btn-warning btn-lg"><%= __('Signup-Button') %></button>
-            </form>
-
-            <hr>
-
-            <p><%= __('Login-Tooltip-Pre') %><a href="/login"><%= __('Login-Tooltip-Link') %></a></p>
-            <p><%= __('Github-Tooltip-Pre') %><a href="https://github.com/vedler/UT-DiscordAdminTool"><%= __('Github-Tooltip-Link') %></a>.</p>
-
-        </div>
-
+				<!-- LOGIN FORM -->
+				<form action="/register" method="post">
+	                <div class="form-group">
+						<label><%= __('Username') %></label>
+						<input type="text" class="form-control form-input" name="username">
+					</div>
+					<div class="form-group">
+	                    <label><%= __('Pass') %></label>
+						<input type="password" class="form-control form-input" name="password">
+					</div>
+	
+					<button type="submit" class="btn btn-warning btn-lg"><%= __('Signup-Button') %></button>
+				</form>
+	
+				<hr>
+	
+				<p><%= __('Login-Tooltip-Pre') %><a href="/login"><%= __('Login-Tooltip-Link') %></a></p>
+				<p><%= __('Github-Tooltip-Pre') %><a href="https://github.com/vedler/UT-DiscordAdminTool"><%= __('Github-Tooltip-Link') %></a>.</p>
+	
+			</div>
+		</div>
     </div>
 </body>
 </html>
