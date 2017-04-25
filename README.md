@@ -15,7 +15,7 @@ http://ut-discordadmintool.azurewebsites.net/
 Kui mingil põhjusel kood tööle ei lähe, siis tasub kõigepealt teha projektikaustas käsurealt:
 
 
-1) Administraatoriõigustega (Run as admin) käsurealt ükskõik kust:
+1) Administraatoriõigustega (Run as admin) käsurealt ükskõik kust (pärast commandide jooksutamist restart arvutile):
 
 ```npm install --global --production windows-build-tools```
 
