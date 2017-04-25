@@ -30,15 +30,50 @@ $(function () {
             };
         } else {
             // Ajax request from params
-            parameters = {
-                pageAction: event.getState('page_action'),
-                dataContext: event.getState('data_context')
-            };
+
+            var page_action = event.getState('page_action');
+            var data_context = event.getState('data_context');
+
+            if (!page_action || !data_context) {
+                parameters = {
+                    pageAction: 'asd',
+                    dataContext: ''
+                };
+            } else {
+                parameters = {
+                    pageAction: event.getState('page_action'),
+                    dataContext: event.getState('data_context')
+                };
+            }
+
+            
         }
 
-        $.get('/ajax-get-menu', parameters, function (data) {
-            $('.discordat-menubuttons-container').html(data);
+        var ajaxResult = new Object();
+
+        $.get('/ajax-get-menu', parameters, function (result) {
+            var html = ejs.render(result.template, result.data);
+
+            $('.discordat-menubuttons-container').html(html);
         });
+
+       /* $.get(ajaxResult.templatePath, function (template) {
+            var html = ejs.render(template, ajaxResult.data);
+
+            $('.discordat-menubuttons-container').html(html);
+        });
+        */
+        /*$.ajax({
+            type: 'GET',
+            url: '/ajax-get-menu',
+            success: function (result) {
+
+                
+                
+                //var html = new EJS({ url: result.templatePath }).render(result.data);
+                //$('.discordat-menubuttons-container').html(html);
+            }
+        });*/
 
         $('.discordat-menu-loading').hide();
     })

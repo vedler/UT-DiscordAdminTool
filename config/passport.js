@@ -24,6 +24,8 @@ module.exports = function (passport) {
     passport.deserializeUser(function (id, done) {
         connection.query("SELECT * FROM users WHERE p_id = ? ", [id], function (err, rows) {
 
+            console.log('des');
+
             var user = {
                 id: rows[0].p_id.value,
                 provider: rows[0].provider.value,
@@ -32,6 +34,7 @@ module.exports = function (passport) {
                 token: rows[0].token.value,
                 email: rows[0].email.value
             }
+            console.log('desend');
 
             done(err, user);
         });

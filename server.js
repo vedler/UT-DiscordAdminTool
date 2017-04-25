@@ -65,11 +65,10 @@ app.use(i18n.init);
 
 // routes 
 require('./app/globalparams.js')(app, passport, i18n);
-require('./app/routes.js')(app, passport, ejs); // load our routes and pass in our app and fully configured passport
+require('./app/routes.js')(app, passport, ejs, fs); // load our routes and pass in our app and fully configured passport
 
 require('./app/menuloader.js')(app, passport, path, fs);
 
 // start the app
 app.listen(port);
 console.log('The magic happens on port ' + port);
-
