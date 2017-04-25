@@ -15,5 +15,7 @@ http://ut-discordadmintool.azurewebsites.net/
 Kui mingil põhjusel kood tööle ei lähe, siis tasub kõigepealt teha projektikaustas käsurealt:
 
 ```npm install -g node-gyp```
+
 ```npm install```
+
 ```node setup\create_database.js```
