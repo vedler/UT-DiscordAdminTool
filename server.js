@@ -69,6 +69,39 @@ require('./app/routes.js')(app, passport, ejs, fs); // load our routes and pass 
 
 require('./app/menuloader.js')(app, passport, path, fs);
 
-// start the app
+// -------------------- Discord connection -------------------------
+
+try {
+	var Discord = require("discord.js");
+} catch (e) {
+	console.log(e.stack);
+	console.log(process.version);
+	console.log("Please run npm install and ensure it passes with no errors!");
+	process.exit();
+}
+
+try {
+    var AuthDetails = require("./config/discord-auth.json");
+} catch (e) {
+    console.log("Discord authentication config (config/discord-auth.json) not found.\n" + e.stack);
+    process.exit();
+}
+
+var bot = new Discord.Client();
+
+bot.on("ready", function() {
+    console.log("Logged in! Serving in " + bot.guilds.array().length + " servers");
+    bot.user.setGame("Discord Admin Tool bot");
+});
+
+require('./app/discord-lib.js')(app, Discord, bot);
+
+// --------------- start the app -----------------------------
 app.listen(port);
 console.log('The magic happens on port ' + port);
+
+if (AuthDetails.bot_token) {
+    console.log("logging in with token");
+    bot.login(AuthDetails.bot_token);
+} 
+

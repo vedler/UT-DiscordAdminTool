@@ -1,10 +1,15 @@
 $(function () {
+    // UNUSED
     $('.discord-at-dynbutton').on('click', function (event) {
         // TODO: Possibly more data details, i.e. page context, button type, button detail data (nested json?)
 
+        var hashstuff = $.deparam(event.fragment, true);
+        console.log(hashstuff);
+
         var state = {
-            page_action: 'asd',
-            data_context: $(event.target).data('context')
+            page_action: hashstuff.page_action,
+            data_context: hashstuff.data_context,
+            context_additional: $(event.target).data('context')
         };
 
         $.bbq.pushState(state);
@@ -25,7 +30,7 @@ $(function () {
         // Load the defaults
         if (hashParams == '') {
             parameters = {
-                pageAction: 'asd',
+                pageAction: '',
                 dataContext: ''
             };
         } else {
@@ -36,7 +41,7 @@ $(function () {
 
             if (!page_action || !data_context) {
                 parameters = {
-                    pageAction: 'asd',
+                    pageAction: '',
                     dataContext: ''
                 };
             } else {
@@ -49,31 +54,11 @@ $(function () {
             
         }
 
-        var ajaxResult = new Object();
-
         $.get('/ajax-get-menu', parameters, function (result) {
             var html = ejs.render(result.template, result.data);
 
             $('.discordat-menubuttons-container').html(html);
         });
-
-       /* $.get(ajaxResult.templatePath, function (template) {
-            var html = ejs.render(template, ajaxResult.data);
-
-            $('.discordat-menubuttons-container').html(html);
-        });
-        */
-        /*$.ajax({
-            type: 'GET',
-            url: '/ajax-get-menu',
-            success: function (result) {
-
-                
-                
-                //var html = new EJS({ url: result.templatePath }).render(result.data);
-                //$('.discordat-menubuttons-container').html(html);
-            }
-        });*/
 
         $('.discordat-menu-loading').hide();
     })

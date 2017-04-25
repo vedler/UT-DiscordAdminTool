@@ -3,43 +3,90 @@
 module.exports = function (app, passport, path, fs) {
 
 	this.getMenuTemplate = function (pageAction) {
+        
+        switch (pageAction) {
+            default:
+                return path.join(__dirname, '../', 'views/menus/initialmenu.ejs');
+        }
+    }
 
-        // TODO: Based on page action, load a new template
+    this.getDefaultMenuData = function() {
+        var data = new Object();
+        var menuMainButtons = [];
 
-		return path.join(__dirname, '../', 'views/menus/initialmenu.ejs');
-	}
+        console.log("getting list");
+
+        var servers = getDiscordBotServerList();
+
+        console.log("got list: " + servers);
+
+        if (servers) {
+            servers.forEach(function(server) {
+                var button = new Object();
+
+                button.targetaction = "joinServer";
+                button.datacontext = server.id;
+                button.textcontent = server.name;
+
+                menuMainButtons.push(button);
+            });
+        }
+
+        data.menuMainButtons = menuMainButtons;
+        return data;
+    }
 
     this.getMenuData = function (pageAction, dataContext) {
 
         // Based on pageAction and dataContext, load new data
 
 		var data = new Object();
-		var menuMainButtons = [];
+        var menuMainButtons = [];
+        
+        switch (pageAction) {
 
-		if (dataContext == '') {
-            for (var i = 0; i < 5; i++) {
+            case 'joinServer':
 
-                var button = new Object();
+                if (dataContext == '') {
+                    // TODO: Could also append to data here
+                    return getDefaultMenuData();
+                }
 
-                button.targetaction = "ASD";
-                button.datacontext = i;
-                button.textcontent = "lol" + i;
+                var guild = findClientGuild(dataContext);
 
-                menuMainButtons.push(button);
-            }
-		} else {
+                // Guild not found
+                if (typeof guild === 'undefined') {
+                    return getDefaultMenuData();
+                }
 
-			var button = new Object();
+                for (var [id, channel] of guild.channels.entries()) {
 
-            button.targetaction = "asd";
-            button.datacontext = dataContext;
-			button.textcontent = "lol"+dataContext;
-			for (var i = 0; i < 8; i++) {
-				menuMainButtons.push(button);
-			}
-		}
+                    // Text only for now
+                    if (channel.type != 'text') {
+                        continue;
+                    }
 
+                    var button = new Object();
 
+                    button.targetaction = "joinChannel";
+                    button.datacontext = channel.id;
+                    button.textcontent = "#" + channel.name;
+
+                    menuMainButtons.push(button);
+                }
+
+                break;
+            case 'joinChannel':
+                // TODO
+                return getDefaultMenuData();
+                //break;
+            
+            default:
+                // Unknown action
+                return getDefaultMenuData();
+        }
+        
+        
 		data.menuMainButtons = menuMainButtons;
 		return data;
 	}
