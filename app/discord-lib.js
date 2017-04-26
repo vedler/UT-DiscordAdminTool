@@ -1,4 +1,4 @@
-module.exports = function(app, Discord, bot) {
+module.exports = function(app, Discord, bot, io) {
 
     bot.on("disconnected", function() {
         console.log("Bot disconnected!");
@@ -39,7 +39,11 @@ module.exports = function(app, Discord, bot) {
     }
 
     bot.on("message", function(msg) {
-        console.log(msg);
+
+        console.log("sending message: " + msg.content);
+        
+        // Broadcast to all.
+        io.sockets.emit('recMessage', msg.channel.id);
     });
 
     bot.on("messageUpdate", (oldMessage, newMessage) => {

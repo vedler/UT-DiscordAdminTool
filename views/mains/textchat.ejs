@@ -1,6 +1,6 @@
-<div class="row max-container">
+<div class="row max-container" id="dat-text-scroller">
     <div class="col-xs-12 col-lg-12 dat-text-container">
-        <% for (var i = 0; i < chatMessages.length; i++) { %>
+        <% for (var i = chatMessages.length-1; i >= 0; i--) { %>
         <p class="dat-chat-name"><%= chatMessages[i].sender %></p>
         <p class="dat-chat-message"><%= chatMessages[i].message %></p>
         <hr class="dat-chat-hr" />

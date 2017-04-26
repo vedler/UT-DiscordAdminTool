@@ -33,6 +33,9 @@ $(function () {
             var html = ejs.render(result.template, result.data);
 
             $('#dat-chat-text-ajax').html(html);
+            $("#dat-text-scroller").stop().animate({
+                scrollTop: $("#dat-text-scroller")[0].scrollHeight
+            }, 800);
         });
     }
 
@@ -73,7 +76,8 @@ $(function () {
             }
         }
 
-        sessionStorage['contextParameters'] = parameters;
+        sessionStorage['contextPageAction'] = parameters.pageAction;
+        sessionStorage['contextDataContext'] = parameters.dataContext;
 
         $.get('/ajax-get-menu', parameters, function (result) {
             var html = ejs.render(result.template, result.data);
@@ -85,6 +89,30 @@ $(function () {
 
         $('.discordat-menu-loading').hide();
     })
+
+    var socket = io.connect('http://utdiscord.localhost:8000');
+
+    socket.on('connect', function () {
+        console.log('socket connected');
+    });
+
+    socket.on('recMessage', function (channelId) {
+        console.log("rec: " + channelId);
+        console.log("ses: " + sessionStorage['contextPageAction']);
+        console.log("ses: " + sessionStorage['contextDataContext']);
+        
+        if (sessionStorage['contextPageAction'] && sessionStorage['contextDataContext'] &&
+            sessionStorage['contextPageAction'] == 'joinChannel' &&
+            sessionStorage['contextDataContext'] == channelId) {
+
+            var parameters = {
+                pageAction: sessionStorage['contextPageAction'],
+                dataContext: sessionStorage['contextDataContext']
+            };
+
+            UpdateMessages(parameters);
+        }
+    });
 
     // Since the event is only triggered when the hash changes, we need to trigger
     // the event now, to handle the hash the page may have loaded with.

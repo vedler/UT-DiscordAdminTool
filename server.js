@@ -95,7 +95,18 @@ bot.on("ready", function() {
     bot.user.setGame("Discord Admin Tool bot");
 });
 
-require('./app/discord-lib.js')(app, Discord, bot);
+var io = require('socket.io').listen(8000);
+
+io.sockets.on('connection', function (socket) {
+
+    console.log("socket conn: " + socket);
+    
+    socket.on('disconnect', function () {
+        console.log("socket disc: " + socket);
+    });
+});
+
+require('./app/discord-lib.js')(app, Discord, bot, io);
 
 // --------------- start the app -----------------------------
 app.listen(port);
@@ -105,3 +116,4 @@ if (AuthDetails.bot_token) {
     console.log("logging in with token");
     bot.login(AuthDetails.bot_token);
 } 
+
