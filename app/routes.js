@@ -1,5 +1,5 @@
 // app/routes.js
-module.exports = function (app, passport) {
+module.exports = function (app, passport, ejs, fs) {
 
     app.get('/', checkAuth, function (req, res) {
         res.render('index.ejs', {
@@ -81,6 +81,18 @@ module.exports = function (app, passport) {
         res.redirect('/');
     });
 
+    app.get('/ajax-get-menu', function (req, res) {
+
+        var templatePath = getMenuTemplate(req.query.pageAction);
+
+        var template = fs.readFileSync(templatePath, 'utf-8');
+
+        res.send({
+            template: template,
+            data: getMenuData(req.query.pageAction, req.query.dataContext)
+        });
+    });
+
     
 
     // =====================================
@@ -101,7 +113,7 @@ module.exports = function (app, passport) {
         req.logout();
         res.redirect('/');
     });
-
+    
 };
 
 // route middleware to make sure a user is logged in
