@@ -68,6 +68,7 @@ require('./app/globalparams.js')(app, passport, i18n);
 require('./app/routes.js')(app, passport, ejs, fs); // load our routes and pass in our app and fully configured passport
 
 require('./app/menuloader.js')(app, passport, path, fs);
+require('./app/maincontentloader.js')(app, passport, path, fs);
 
 // -------------------- Discord connection -------------------------
 
@@ -104,4 +105,3 @@ if (AuthDetails.bot_token) {
     console.log("logging in with token");
     bot.login(AuthDetails.bot_token);
 } 
-

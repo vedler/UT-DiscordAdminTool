@@ -93,6 +93,57 @@ module.exports = function (app, passport, ejs, fs) {
         });
     });
 
+    app.get('/ajax-get-maincontent', function (req, res) {
+
+        var templatePath = getMainContentTemplate(req.query.pageAction);
+
+        var template = '';
+
+        if (templatePath != '') {
+            template = fs.readFileSync(templatePath, 'utf-8');
+        } 
+
+        // Data promise
+        getMainContentData(req.query.pageAction, req.query.dataContext)
+            .then(function (messages) {
+
+                var data = new Object();
+
+                var chatMessages = [];
+
+                console.log("found msg: " + messages);
+
+                messages.forEach(function (message) {
+                    console.log("msg: " + message);
+                    var chatMessage = new Object();
+
+                    chatMessage.sender = message.author.username;
+                    chatMessage.message = message.content;
+
+                    chatMessages.push(chatMessage);
+                });
+
+                data.chatMessages = chatMessages;
+
+                res.send({
+                    template: template,
+                    data: data
+                });
+            })
+            .catch(function (error) {
+                console.error(error);
+
+                var data = new Object();
+                data.chatMessages = [];
+
+                res.send({
+                    template: template,
+                    data: data
+                });
+
+            });
+    });
+
     
 
     // =====================================

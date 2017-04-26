@@ -15,6 +15,27 @@ $(function () {
         $.bbq.pushState(state);
     });
 
+    $('.dat-input-button').on('click', function (event) {
+        var text = $('.dat-input-button').val();
+
+        console.log("ayy: " + text);
+
+    });
+
+    var UpdateMessages = function (parameters) {
+        $.get('/ajax-get-maincontent', parameters, function (result) {
+
+            if (result.template == '') {
+                $('#dat-chat-text-ajax').html('');
+                return;
+            }
+
+            var html = ejs.render(result.template, result.data);
+
+            $('#dat-chat-text-ajax').html(html);
+        });
+    }
+
     // Bind an event to window.onhashchange that, when the history state changes,
     // gets the url from the hash and displays either our cached content or fetches
     // new content to be displayed.
@@ -50,15 +71,17 @@ $(function () {
                     dataContext: event.getState('data_context')
                 };
             }
-
-            
         }
+
+        sessionStorage['contextParameters'] = parameters;
 
         $.get('/ajax-get-menu', parameters, function (result) {
             var html = ejs.render(result.template, result.data);
 
             $('.discordat-menubuttons-container').html(html);
         });
+
+        UpdateMessages(parameters);
 
         $('.discordat-menu-loading').hide();
     })
