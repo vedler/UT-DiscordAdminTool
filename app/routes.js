@@ -45,14 +45,7 @@ module.exports = function (app, passport, ejs, fs) {
         req.logout();
         res.redirect('/');
     });
-
-// =============================================================================
-// AUTHENTICATE (FIRST LOGIN) ==================================================
-// =============================================================================
-
-// locally --------------------------------
-	// LOGIN ===============================
-    // show the login form
+    
     app.get('/login', function (req, res) {
 
         // render the page and pass in any flash data if it exists
@@ -105,59 +98,22 @@ module.exports = function (app, passport, ejs, fs) {
     // handle the callback after facebook has authenticated the user
     app.get('/auth/facebook/callback',
         passport.authenticate('facebook', {
-            successRedirect: '/',
+            successRedirect: '/profile', // TODO
             failureRedirect: '/login'
         }));
 
-// =============================================================================
-// AUTHORIZE (ALREADY LOGGED IN / CONNECTING OTHER SOCIAL ACCOUNT) =============
-// =============================================================================    
-
-// locally --------------------------------
-    app.get('/connect/local', function(req, res) {
-        res.render('connect-local.ejs', { message: req.flash('loginMessage') });
-    });
-    app.post('/connect/local', passport.authenticate('local-register', {
-        successRedirect : '/profile', // redirect to the secure profile section
-        failureRedirect : '/connect/local', // redirect back to the signup page if there is an error
-        failureFlash : true // allow flash messages
-    }));
-
-// facebook -------------------------------
-
-    // send to facebook to do the authentication
-    app.get('/connect/facebook', passport.authorize('facebook', { scope : 'email' }));
-
-    // handle the callback after facebook has authorized the user
-    app.get('/connect/facebook/callback',
-        passport.authorize('facebook', {
-            successRedirect : '/profile',
-            failureRedirect : '/'
-        }));
-
-
-// =============================================================================
-// UNLINK ACCOUNTS =============================================================
-// =============================================================================
-// used to unlink accounts. for social accounts, just remove the token
-// for local account, remove email and password
-// user account will stay active in case they want to reconnect in the future
-
-    // local -----------------------------------
-    app.get('/unlink/local', isLoggedIn, function(req, res) {
-        var user            = req.user;
-        user.local.email    = undefined;
-        user.local.password = undefined;
-        user.save(function(err) {
-            res.redirect('/profile');
-        });
-    });
-
     // facebook -------------------------------
     app.get('/unlink/facebook', isLoggedIn, function(req, res) {
-        var user            = req.user;
+        var user = req.user;
+
+        // Clean up
+        user.facebook.id = undefined;
         user.facebook.token = undefined;
-        user.save(function(err) {
+        user.facebook.name = undefined;
+        user.facebook.email = undefined;
+
+        user.save(function (err) {
+            // TODO: should do context-aware redirect here I think, or even ajax request
             res.redirect('/profile');
         });
     });

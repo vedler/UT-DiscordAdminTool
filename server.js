@@ -116,4 +116,3 @@ if (AuthDetails.bot_token) {
     console.log("logging in with token");
     bot.login(AuthDetails.bot_token);
 } 
-
