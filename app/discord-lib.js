@@ -1,4 +1,4 @@
-module.exports = function(app, Discord, bot) {
+module.exports = function(app, Discord, bot, io) {
 
     bot.on("disconnected", function() {
         console.log("Bot disconnected!");
@@ -18,8 +18,32 @@ module.exports = function(app, Discord, bot) {
         return bot.guilds.get(id);
     }
 
+    this.fetchMessages = function (channelId) {
+
+        console.log("Fecthin channel messages: " + channelId);
+
+        if (!bot.channels.has(channelId)) {
+            return returnEmptyPromise();
+        }
+
+        var channel = bot.channels.get(channelId);
+        console.log("msg ch: " + channel);
+
+        if (channel.type != 'text') {
+            console.log("not txt ch");
+            return returnEmptyPromise();
+        }
+
+        // return the message promise
+        return channel.fetchMessages({ limit: 10 });
+    }
+
     bot.on("message", function(msg) {
-        console.log(msg);
+
+        console.log("sending message: " + msg.content);
+        
+        // Broadcast to all.
+        io.sockets.emit('recMessage', msg.channel.id);
     });
 
     bot.on("messageUpdate", (oldMessage, newMessage) => {

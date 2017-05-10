@@ -1,6 +1,8 @@
 // app/routes.js
 module.exports = function (app, passport, ejs, fs) {
 
+// normal routes ===============================================================
+
     app.get('/', checkAuth, function (req, res) {
         res.render('index.ejs', {
             user: req.user // get the user out of session and pass to template
@@ -26,12 +28,30 @@ module.exports = function (app, passport, ejs, fs) {
         });
     });
 
+	app.get('/profile', checkAuthWithReturn, function (req, res) {
+        res.render('profile.ejs', {
+            user: req.user // get the user out of session and pass to template
+        });
+    });
+
     app.get('/test-noredir', checkAuth, function (req, res) {
         res.render('index.ejs', {
             user: req.user // get the user out of session and pass to template
         });
     });
 
+	// LOGOUT  =================================
+    app.get('/logout', function (req, res) {
+        req.logout();
+        res.redirect('/');
+    });
+
+// =============================================================================
+// AUTHENTICATE (FIRST LOGIN) ==================================================
+// =============================================================================
+
+// locally --------------------------------
+	// LOGIN ===============================
     // show the login form
     app.get('/login', function (req, res) {
 
@@ -61,6 +81,7 @@ module.exports = function (app, passport, ejs, fs) {
 
         });
 
+	// SIGNUP =================================
     // show the signup form
     app.get('/register', function (req, res) {
         // render the page and pass in any flash data if it exists
@@ -76,10 +97,71 @@ module.exports = function (app, passport, ejs, fs) {
         failureFlash: true // allow flash messages
     }));
 
-    app.get('/logout', function (req, res) {
-        req.logout();
-        res.redirect('/');
+// facebook -------------------------------
+
+    // route for facebook authentication and login
+    app.get('/auth/facebook', passport.authenticate('facebook', { scope: 'email' }));
+
+    // handle the callback after facebook has authenticated the user
+    app.get('/auth/facebook/callback',
+        passport.authenticate('facebook', {
+            successRedirect: '/',
+            failureRedirect: '/login'
+        }));
+
+// =============================================================================
+// AUTHORIZE (ALREADY LOGGED IN / CONNECTING OTHER SOCIAL ACCOUNT) =============
+// =============================================================================    
+
+// locally --------------------------------
+    app.get('/connect/local', function(req, res) {
+        res.render('connect-local.ejs', { message: req.flash('loginMessage') });
     });
+    app.post('/connect/local', passport.authenticate('local-register', {
+        successRedirect : '/profile', // redirect to the secure profile section
+        failureRedirect : '/connect/local', // redirect back to the signup page if there is an error
+        failureFlash : true // allow flash messages
+    }));
+
+// facebook -------------------------------
+
+    // send to facebook to do the authentication
+    app.get('/connect/facebook', passport.authorize('facebook', { scope : 'email' }));
+
+    // handle the callback after facebook has authorized the user
+    app.get('/connect/facebook/callback',
+        passport.authorize('facebook', {
+            successRedirect : '/profile',
+            failureRedirect : '/'
+        }));
+
+
+// =============================================================================
+// UNLINK ACCOUNTS =============================================================
+// =============================================================================
+// used to unlink accounts. for social accounts, just remove the token
+// for local account, remove email and password
+// user account will stay active in case they want to reconnect in the future
+
+    // local -----------------------------------
+    app.get('/unlink/local', isLoggedIn, function(req, res) {
+        var user            = req.user;
+        user.local.email    = undefined;
+        user.local.password = undefined;
+        user.save(function(err) {
+            res.redirect('/profile');
+        });
+    });
+
+    // facebook -------------------------------
+    app.get('/unlink/facebook', isLoggedIn, function(req, res) {
+        var user            = req.user;
+        user.facebook.token = undefined;
+        user.save(function(err) {
+            res.redirect('/profile');
+        });
+    });
+
 
     app.get('/ajax-get-menu', function (req, res) {
 
@@ -93,27 +175,56 @@ module.exports = function (app, passport, ejs, fs) {
         });
     });
 
-    
+    app.get('/ajax-get-maincontent', function (req, res) {
 
-    // =====================================
-    // FACEBOOK ROUTES =====================
-    // =====================================
-    // route for facebook authentication and login
-    app.get('/auth/facebook', passport.authenticate('facebook', { scope: 'email' }));
+        var templatePath = getMainContentTemplate(req.query.pageAction);
 
-    // handle the callback after facebook has authenticated the user
-    app.get('/auth/facebook/callback',
-        passport.authenticate('facebook', {
-            successRedirect: '/',
-            failureRedirect: '/login'
-        }));
+        var template = '';
 
-    // route for logging out
-    app.get('/logout', function (req, res) {
-        req.logout();
-        res.redirect('/');
+        if (templatePath != '') {
+            template = fs.readFileSync(templatePath, 'utf-8');
+        } 
+
+        // Data promise
+        getMainContentData(req.query.pageAction, req.query.dataContext)
+            .then(function (messages) {
+
+                var data = new Object();
+
+                var chatMessages = [];
+
+                console.log("found msg: " + messages);
+
+                messages.forEach(function (message) {
+                    console.log("msg: " + message);
+                    var chatMessage = new Object();
+
+                    chatMessage.sender = message.author.username;
+                    chatMessage.message = message.content;
+
+                    chatMessages.push(chatMessage);
+                });
+
+                data.chatMessages = chatMessages;
+
+                res.send({
+                    template: template,
+                    data: data
+                });
+            })
+            .catch(function (error) {
+                console.error(error);
+
+                var data = new Object();
+                data.chatMessages = [];
+
+                res.send({
+                    template: template,
+                    data: data
+                });
+
+            });
     });
-    
 };
 
 // route middleware to make sure a user is logged in

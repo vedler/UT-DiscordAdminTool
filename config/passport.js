@@ -4,24 +4,35 @@
 var LocalStrategy = require('passport-local').Strategy;
 
 // load up the user model
-var mysql = require('mysql');
+// var mysql = require('mysql');
+
 // TODO: Different library for hashing
 var bcrypt = require('bcrypt-nodejs');
 var dbconfig = require('./database');
-var connection = mysql.createConnection(dbconfig.connection);
+var mongoose = require('mongoose');
+//var connection = mysql.createConnection(dbconfig.connection);
+mongoose.Promise = global.Promise;
+mongoose.connect(dbconfig.url, function(err, db) {
+
+  if (err) throw err;
+  console.log("sees");
+});
+
 var FacebookStrategy = require('passport-facebook').Strategy;
 
+// load up the user model
+var User = require('../app/models/user');
 // load the auth variables
 var configAuth = require('./auth');
 
-connection.query('USE ' + dbconfig.database);
+//connection.query('USE ' + dbconfig.database);
 // expose this function to our app using module.exports
 module.exports = function (passport) {
     // used to serialize the user for the session
     passport.serializeUser((user, done) => done(null, user.id));
 
     // used to deserialize the user
-    passport.deserializeUser(function (id, done) {
+    /*passport.deserializeUser(function (id, done) {
         connection.query("SELECT * FROM users WHERE p_id = ? ", [id], function (err, rows) {
 
             var user = {
@@ -35,20 +46,24 @@ module.exports = function (passport) {
 
             done(err, user);
         });
+    });*/
+
+	// used to deserialize the user
+    passport.deserializeUser(function(id, done) {
+        User.findById(id, function(err, user) {
+            done(err, user);
+        });
     });
 
     // Passport strategy for registration
     passport.use(
         'local-register',
         new LocalStrategy({
-
-            usernameField: 'name',
-            passwordField: 'password',
             passReqToCallback: true
         },
             function (req, username, password, done) {
 
-                connection.query("SELECT * FROM users WHERE name = ?", [username], function (err, rows) {
+                /*connection.query("SELECT * FROM users WHERE name = ?", [username], function (err, rows) {
                     if (err)
                         return done(err);
                     if (rows.length) {
@@ -74,7 +89,71 @@ module.exports = function (passport) {
                             return done(null, user);
                         });
                     }
-                });
+                });*/
+
+
+				// asynchronous
+				//process.nextTick(function() {
+					// if the user is not already logged in:
+					if (!req.user) {
+						User.findOne({ 'local.username' :  username }, function(err, user) {
+							// if there are any errors, return the error
+							if (err){
+								console.warn("siin");
+								return done(err);
+							}
+		
+							// check to see if theres already a user with that username
+							if (user) {
+								return done(null, false, req.flash('signupMessage', 'That username is already taken.'));
+							} else {
+		
+								// create the user
+								var newUser            = new User();
+		
+								newUser.local.username    = username;
+								newUser.local.password = newUser.generateHash(password);
+
+								newUser.save(function(err) {
+									if (err)
+										return done(err);
+		
+									return done(null, newUser);
+								});
+							}
+		
+						});
+					// if the user is logged in but has no local account...
+					} else if ( !req.user.local.username ) {
+						// ...presumably they're trying to connect a local account
+						// BUT let's check if the username used to connect a local account is being used by another user
+						User.findOne({ 'local.username' :  username }, function(err, user) {
+							if (err)
+								return done(err);
+                    
+		                    if (user) {
+								return done(null, false, req.flash('loginMessage', 'That username is already taken.'));
+								// Using 'loginMessage instead of signupMessage because it's used by /connect/local'
+							} else {
+								var user = req.user;
+								user.local.username = username;
+								user.local.password = user.generateHash(password);
+								user.save(function (err) {
+									if (err)
+										return done(err);
+		                            
+									return done(null,user);
+								});
+							}
+						});
+					} else {
+						// user is logged in and already has a local account. Ignore signup. (You should log out before trying to create a new account, user!)
+						return done(null, req.user);
+					}
+		
+		        //});
+
+
             })
     );
 
@@ -82,13 +161,10 @@ module.exports = function (passport) {
     passport.use(
         'local-login',
         new LocalStrategy({
-
-            usernameField: 'name',
-            passwordField: 'password',
             passReqToCallback: true
         },
             function (req, username, password, done) {
-                connection.query("SELECT * FROM users WHERE name = ?", [username], function (err, rows) {
+                /*connection.query("SELECT * FROM users WHERE name = ?", [username], function (err, rows) {
                     if (err)
                         return done(err);
                     if (!rows.length) {
@@ -111,11 +187,118 @@ module.exports = function (passport) {
 
                     // all is well, return successful user
                     return done(null, user);
-                });
+                });*/
+
+				// asynchronous
+				//process.nextTick(function() {
+					User.findOne({ 'local.username' :  username }, function(err, user) {
+						// if there are any errors, return the error
+						if (err)
+							return done(err);
+
+						// if no user is found, return the message
+						if (!user)
+							return done(null, false, req.flash('loginMessage', 'No user found.'));
+
+		                if (!user.validPassword(password))
+				            return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
+
+						// all is well, return user
+						else
+							return done(null, user);
+					});
+				//});
+
             })
     );
 
 
+	// Passport strategy for facebook
+
+	/*var fbStrategy = configAuth.facebookAuth;
+    fbStrategy.passReqToCallback = true;  // allows us to pass in the req from our route (lets us check if a user is logged in or not)
+    
+	passport.use(new FacebookStrategy(fbStrategy,*/
+
+	passport.use(new FacebookStrategy({
+
+        // pull in our app id and secret from our auth.js file
+        clientID: configAuth.facebookAuth.clientID,
+        clientSecret: configAuth.facebookAuth.clientSecret,
+        callbackURL: configAuth.facebookAuth.callbackURL,
+        profileFields: ["id", "emails", "name"],
+		passReqToCallback: true
+    },
+    function(req, token, refreshToken, profile, done) {
+
+        // asynchronous
+        process.nextTick(function() {
+
+            // check if the user is already logged in
+            if (!req.user) {
+
+                User.findOne({ 'facebook.id' : profile.id }, function(err, user) {
+                    if (err)
+                        return done(err);
+
+                    if (user) {
+
+                        // if there is a user id already but no token (user was linked at one point and then removed)
+                        if (!user.facebook.token) {
+                            user.facebook.token = token;
+                            user.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName;
+                            user.facebook.email = (profile.emails[0].value || '').toLowerCase();
+
+                            user.save(function(err) {
+                                if (err)
+                                    return done(err);
+                                    
+                                return done(null, user);
+                            });
+                        }
+
+                        return done(null, user); // user found, return that user
+                    } else {
+                        // if there is no user, create them
+                        var newUser            = new User();
+
+                        newUser.facebook.id    = profile.id;
+                        newUser.facebook.token = token;
+                        newUser.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName;
+                        newUser.facebook.email = (profile.emails[0].value || '').toLowerCase();
+
+                        newUser.save(function(err) {
+                            if (err)
+                                return done(err);
+                                
+                            return done(null, newUser);
+                        });
+                    }
+                });
+
+            } else {
+                // user already exists and is logged in, we have to link accounts
+                var user            = req.user; // pull the user out of the session
+
+                user.facebook.id    = profile.id;
+                user.facebook.token = token;
+                user.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName;
+                user.facebook.email = (profile.emails[0].value || '').toLowerCase();
+
+                user.save(function(err) {
+                    if (err)
+                        return done(err);
+                        
+                    return done(null, user);
+                });
+
+            }
+        });
+
+    }));
+
+
+	/*
     passport.use(new FacebookStrategy({
 
         // pull in our app id and secret from our auth.js file
@@ -129,8 +312,8 @@ module.exports = function (passport) {
         function (accessToken, refreshToken, profile, done) {
             
 
-            /* asynchronous
-            process.nextTick(function () {*/
+            // asynchronous
+            //process.nextTick(function () {
             connection.query("SELECT * FROM users WHERE p_id = ?", [profile.id.toString() + '.' + 'facebook'], function (err, exUser) {
                 if (err) {
                     return done(err);
@@ -175,10 +358,15 @@ module.exports = function (passport) {
                     });
                 }
             });
+
+
         })
     );
-
+	*/
 };
+
+
+
                 /* find the user in the database based on their facebook id
                 User.findOne({ 'facebook.id': profile.id }, function (err, user) {
 

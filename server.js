@@ -68,6 +68,7 @@ require('./app/globalparams.js')(app, passport, i18n);
 require('./app/routes.js')(app, passport, ejs, fs); // load our routes and pass in our app and fully configured passport
 
 require('./app/menuloader.js')(app, passport, path, fs);
+require('./app/maincontentloader.js')(app, passport, path, fs);
 
 // -------------------- Discord connection -------------------------
 
@@ -94,7 +95,18 @@ bot.on("ready", function() {
     bot.user.setGame("Discord Admin Tool bot");
 });
 
-require('./app/discord-lib.js')(app, Discord, bot);
+var io = require('socket.io').listen(8000);
+
+io.sockets.on('connection', function (socket) {
+
+    console.log("socket conn: " + socket);
+    
+    socket.on('disconnect', function () {
+        console.log("socket disc: " + socket);
+    });
+});
+
+require('./app/discord-lib.js')(app, Discord, bot, io);
 
 // --------------- start the app -----------------------------
 app.listen(port);
