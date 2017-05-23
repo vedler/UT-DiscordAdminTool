@@ -21,6 +21,8 @@
     <!-- Custom styles for this template -->
     <link href="../static/css/main.css" rel="stylesheet" />
 
+    <link href="../static/css/style.css" rel="stylesheet" />
+
 
     <!--<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">-->
@@ -54,6 +56,14 @@
                 <ul class="nav navbar-nav">
                     <li class="active"><a href="/">Home</a></li>
                     <li><a href="/profile">Profile</a></li>
+                    <li><a href="javascript:void(0);" class="overlaybutton" id="myBtn">Options</a></li>
+                    <div id="myModal" class="modal">
+                        <!-- Modal content -->
+                        <div class="modal-content">
+                            <span class="close">&times;</span>
+                            <embed src="menu" height="500px" width="500px">
+                        </div>
+                    </div>
                     <li><a href="/map">Map</a></li>
                     <li><a href="/logout">Logout</a></li>
                 </ul>
@@ -128,5 +138,6 @@
     <script src="../static/js/jquery.ba-bbq.min.js"></script>
     <script src="../static/js/ejs.min.js"></script>
     <script src="../static/js/ajaxhandler.js"></script>
+    <script src="../static/js/overlayhandler.js"></script>
 </body>
 </html>

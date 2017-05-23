@@ -58,6 +58,12 @@ module.exports = function (app, passport, ejs, fs) {
         res.render('login.ejs', { message: req.flash('loginMessage') });
     });
 
+    app.get('/menu', checkAuthWithReturn, function (req, res) {
+        res.render('menu.ejs', {
+            user: req.user // get the user out of session and pass to template
+        });
+    });
+
     // process the login form
     app.post('/login', passport.authenticate('local-login', {
         //successRedirect: '/', // redirect to the secure profile section -- REPLACED with a "dynamic" selection of redirection path
