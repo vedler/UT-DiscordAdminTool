@@ -72,6 +72,13 @@ body {
     height: calc(100% + 10px);
     width: 100%;
 }
+
+#map {
+	margin-left: 50px;
+	width:	500px;
+	height:	500px;
+}
+
 /*
  * Off Canvas
  * --------------------------------------------------

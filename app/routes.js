@@ -34,6 +34,12 @@ module.exports = function (app, passport, ejs, fs) {
         });
     });
 
+	app.get('/map', checkAuthWithReturn, function (req, res) {
+        res.render('map.ejs', {
+            user: req.user // get the user out of session and pass to template
+        });
+    });
+
     app.get('/test-noredir', checkAuth, function (req, res) {
         res.render('index.ejs', {
             user: req.user // get the user out of session and pass to template
