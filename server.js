@@ -86,7 +86,6 @@ app.use(i18n.init);
 
 // routes 
 require('./app/globalparams.js')(app, passport, i18n);
-require('./app/routes.js')(app, passport, ejs, fs, expressValidator); // load our routes and pass in our app and fully configured passport
 
 require('./app/menuloader.js')(app, passport, path, fs);
 require('./app/maincontentloader.js')(app, passport, path, fs);
@@ -130,6 +129,7 @@ io.sockets.on('connection', function (socket) {
 require('./app/discord-lib.js')(app, Discord, bot, io);
 
 // --------------- start the app -----------------------------
+require('./app/routes.js')(app, passport, ejs, fs, expressValidator, bot); // load our routes and pass in our app and fully configured passport
 app.listen(port);
 console.log('The magic happens on port ' + port);
 

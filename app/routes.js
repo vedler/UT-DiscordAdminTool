@@ -1,5 +1,5 @@
 // app/routes.js
-module.exports = function (app, passport, ejs, fs, expressValidator) {
+module.exports = function (app, passport, ejs, fs, expressValidator, bot, dlib) {
 
 // normal routes ===============================================================
 
@@ -63,8 +63,6 @@ module.exports = function (app, passport, ejs, fs, expressValidator) {
                 stats: _stats
             });
         }
-
-        
     });
 
     app.get('/allusers', checkAuthWithReturn, function (req, res) {
@@ -116,6 +114,33 @@ module.exports = function (app, passport, ejs, fs, expressValidator) {
             });
         }
     });
+    
+    app.post('/send-chat-message', checkAuth, function (req, res) {
+        req.checkBody('channelId', 'Invalid CHID').notEmpty().isInt();
+        req.checkBody('msg', 'Empty message').notEmpty();
+
+        req.getValidationResult().then(function (result) {
+            if (!result.isEmpty()) {
+                res.json({
+                    error: 'There have been validation errors: ' + JSON.stringify(result.array())
+                });
+            } else {
+                // TODO Send message
+
+                var channel = findClientGuildChannel(req.body.channelId);
+
+                channel.sendMessage(req.body.msg).then(function (e) {
+                    res.json({
+                        success: "Success!"
+                    });
+                }).catch(function (err) {
+                    res.json({
+                        error: 'Unknown error: ' + err
+                    });
+                });
+            }
+        });
+    });
 
     app.post('/add-guild-access', checkAuth, function (req, res) {
         req.checkBody('level', 'Invalid level').notEmpty().isInt();
@@ -145,6 +170,12 @@ module.exports = function (app, passport, ejs, fs, expressValidator) {
         });
     });
 
+	app.get('/map', checkAuthWithReturn, function (req, res) {
+        res.render('map.ejs', {
+            user: req.user // get the user out of session and pass to template
+        });
+    });
+
     app.get('/test-noredir', checkAuth, function (req, res) {
         res.render('index.ejs', {
             user: req.user // get the user out of session and pass to template
@@ -161,6 +192,12 @@ module.exports = function (app, passport, ejs, fs, expressValidator) {
 
         // render the page and pass in any flash data if it exists
         res.render('login.ejs', { message: req.flash('loginMessage') });
+    });
+
+    app.get('/menu', checkAuthWithReturn, function (req, res) {
+        res.render('menu.ejs', {
+            user: req.user // get the user out of session and pass to template
+        });
     });
 
     // process the login form
@@ -269,17 +306,19 @@ module.exports = function (app, passport, ejs, fs, expressValidator) {
                     console.error(err);
 
                     var data = new Object();
+                    data.channel = req.query.dataContext;
                     data.chatMessages = [];
 
                     res.send({
                         template: template,
-                        data: data
+                        data: data,
                     });
                 } else {
                     dataPromise.then(
                         function (messages) {
 
                             var data = new Object();
+                            data.channel = req.query.dataContext;
 
                             var chatMessages = [];
 
@@ -306,6 +345,7 @@ module.exports = function (app, passport, ejs, fs, expressValidator) {
                             console.error(error);
 
                             var data = new Object();
+                            data.channel = req.query.dataContext;
                             data.chatMessages = [];
 
                             res.send({

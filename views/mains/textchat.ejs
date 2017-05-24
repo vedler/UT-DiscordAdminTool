@@ -9,10 +9,13 @@
 
 </div><!--/row-->
 <div class="dat-input-container">
-    <div class="col-xs-10 col-sm-10 dat-input-text-container">
-        <textarea id="msg" class="form-control dat-input-text" name="msg" rows="3" placeholder="Enter message"></textarea>
-    </div>
-    <div class="col-xs-2 col-sm-2 dat-input-button-container">
-        <button type="button" class="btn btn-primary btn-xs dat-input-button" data-toggle="offcanvas">Send</button>
-    </div>
+    <form action="/send-chat-message" method="post" class="dat-servmsg-form">
+        <div class="col-xs-10 col-sm-10 dat-input-text-container">
+            <textarea id="msg" class="form-control dat-input-text" name="msg" rows="3" placeholder="Enter message"></textarea>
+        </div>
+        <div class="col-xs-2 col-sm-2 dat-input-button-container">
+            <input type="submit" class="btn btn-primary btn-xs dat-input-button" data-toggle="offcanvas" value="Send"/>
+        </div>
+        <input type="hidden" value="<%= channel %>" name="channelId" />
+    </form>
 </div>

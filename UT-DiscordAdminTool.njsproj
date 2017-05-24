@@ -1,120 +1,132 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <PropertyGroup>
-        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-        <SchemaVersion>2.0</SchemaVersion>
-        <ProjectGuid>{2f135fd2-6859-4c70-aea1-ed6f3f6ed101}</ProjectGuid>
-        <ProjectHome />
-        <ProjectView>ShowAllFiles</ProjectView>
-        <StartupFile>server.js</StartupFile>
-        <WorkingDirectory>.</WorkingDirectory>
-        <OutputPath>.</OutputPath>
-        <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
-        <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">14.0</VisualStudioVersion>
-        <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
-    <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
-    <ItemGroup>
-        <Content Include="robots.txt" />
-        <Content Include="HTMLPage.html" />
-        <Content Include="favicon.ico" />
-        <Content Include="azuredeploy.json" />
-        <Content Include="package.json" />
-        <Content Include="README.md" />
-        <Compile Include="server.js" />
-        <Compile Include="app\discord-lib.js" />
-        <Compile Include="app\globalparams.js" />
-        <Compile Include="app\maincontentloader.js" />
-        <Compile Include="app\menuloader.js" />
-        <Compile Include="app\routes.js" />
-        <Content Include="config\discord-auth.json" />
-        <Content Include="config\discord-perms.json" />
-        <Compile Include="config\auth.js" />
-        <Compile Include="config\database.js" />
-        <Compile Include="config\passport.js" />
-        <Content Include="iisnode\VEDLER-PC-11424-stderr-1494343703089.txt" />
-        <Content Include="iisnode\VEDLER-PC-11424-stdout-1494343703088.txt" />
-        <Content Include="iisnode\index.html" />
-        <Content Include="locales\ee.json" />
-        <Content Include="locales\en.json" />
-        <Compile Include="setup\create_database.js" />
-        <Content Include="views\index.ejs" />
-        <Content Include="views\login.ejs" />
-        <Content Include="views\profile.ejs" />
-        <Content Include="views\register.ejs" />
-        <Content Include="views\signup.ejs" />
-        <Compile Include="app\models\user.js" />
-        <Content Include="static\css\bootstrap.min.css" />
-        <Content Include="static\css\ie10-viewport-bug-workaround.css" />
-        <Content Include="static\css\main.css" />
-        <Compile Include="static\js\ajaxhandler.js" />
-        <Compile Include="static\js\bootstrap.min.js" />
-        <Compile Include="static\js\ejs.min.js" />
-        <Compile Include="static\js\fluidmenu.js" />
-        <Compile Include="static\js\ie10-viewport-bug-workaround.js" />
-        <Compile Include="static\js\jquery.ba-bbq.min.js" />
-        <Compile Include="static\js\jquery.min.js" />
-        <Compile Include="static\js\jquery.msie-bwcompat.js" />
-        <Compile Include="static\js\jquery.simple.websocket.min.js" />
-        <Compile Include="static\js\socket.io.min.js" />
-        <Content Include="views\mains\textchat.ejs" />
-        <Content Include="views\menus\initialmenu.ejs" />
-    </ItemGroup>
-    <ItemGroup>
-        <Folder Include="app" />
-        <Folder Include="app\models" />
-        <Folder Include="config" />
-        <Folder Include="iisnode" />
-        <Folder Include="locales" />
-        <Folder Include="setup" />
-        <Folder Include="static" />
-        <Folder Include="static\css" />
-        <Folder Include="static\js" />
-        <Folder Include="views" />
-        <Folder Include="views\mains" />
-        <Folder Include="views\menus" />
-    </ItemGroup>
-    <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-    <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->
-    <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />
-    <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
-    <ProjectExtensions>
-        <VisualStudio>
-          <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
-            <WebProjectProperties>
-              <UseIIS>False</UseIIS>
-              <AutoAssignPort>True</AutoAssignPort>
-              <DevelopmentServerPort>0</DevelopmentServerPort>
-              <DevelopmentServerVPath>/</DevelopmentServerVPath>
-              <IISUrl>http://localhost:48022/</IISUrl>
-              <NTLMAuthentication>False</NTLMAuthentication>
-              <UseCustomServer>True</UseCustomServer>
-              <CustomServerUrl>http://localhost:1337</CustomServerUrl>
-              <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
-            </WebProjectProperties>
-          </FlavorProperties>
-          <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
-            <WebProjectProperties>
-              <StartPageUrl>
-              </StartPageUrl>
-              <StartAction>CurrentPage</StartAction>
-              <AspNetDebugging>True</AspNetDebugging>
-              <SilverlightDebugging>False</SilverlightDebugging>
-              <NativeDebugging>False</NativeDebugging>
-              <SQLDebugging>False</SQLDebugging>
-              <ExternalProgram>
-              </ExternalProgram>
-              <StartExternalURL>
-              </StartExternalURL>
-              <StartCmdLineArguments>
-              </StartCmdLineArguments>
-              <StartWorkingDirectory>
-              </StartWorkingDirectory>
-              <EnableENC>False</EnableENC>
-              <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
-            </WebProjectProperties>
-          </FlavorProperties>
-        </VisualStudio>
-    </ProjectExtensions>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2f135fd2-6859-4c70-aea1-ed6f3f6ed101}</ProjectGuid>
+    <ProjectHome />
+    <ProjectView>ShowAllFiles</ProjectView>
+    <StartupFile>server.js</StartupFile>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">14.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <ItemGroup>
+    <Content Include="config\mongoconfig.xml" />
+    <Content Include="robots.txt" />
+    <Content Include="HTMLPage.html" />
+    <Content Include="favicon.ico" />
+    <Content Include="azuredeploy.json" />
+    <Content Include="package.json" />
+    <Content Include="README.md" />
+    <Compile Include="app\models\guildaccess.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="server.js" />
+    <Compile Include="app\discord-lib.js" />
+    <Compile Include="app\globalparams.js" />
+    <Compile Include="app\maincontentloader.js" />
+    <Compile Include="app\menuloader.js" />
+    <Compile Include="app\routes.js" />
+    <Content Include="config\discord-auth.json" />
+    <Content Include="config\discord-perms.json" />
+    <Compile Include="config\auth.js" />
+    <Compile Include="config\database.js" />
+    <Compile Include="config\passport.js" />
+    <Content Include="iisnode\VEDLER-PC-11424-stderr-1494343703089.txt" />
+    <Content Include="iisnode\VEDLER-PC-11424-stdout-1494343703088.txt" />
+    <Content Include="iisnode\index.html" />
+    <Content Include="locales\ee.json" />
+    <Content Include="locales\en.json" />
+    <Compile Include="setup\create_database.js" />
+    <Content Include="views\allusers.ejs">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="views\index.ejs" />
+    <Content Include="views\login.ejs" />
+    <Content Include="views\profile.ejs" />
+    <Content Include="views\register.ejs" />
+    <Compile Include="app\models\user.js" />
+    <Content Include="static\css\bootstrap.min.css" />
+    <Content Include="static\css\ie10-viewport-bug-workaround.css" />
+    <Content Include="static\css\main.css" />
+    <Compile Include="static\js\adminajaxhandler.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="static\js\ajaxhandler.js" />
+    <Compile Include="static\js\bootstrap.min.js" />
+    <Compile Include="static\js\ejs.min.js" />
+    <Compile Include="static\js\fluidmenu.js" />
+    <Compile Include="static\js\ie10-viewport-bug-workaround.js" />
+    <Compile Include="static\js\jquery.ba-bbq.min.js" />
+    <Compile Include="static\js\jquery.min.js" />
+    <Compile Include="static\js\jquery.msie-bwcompat.js" />
+    <Compile Include="static\js\jquery.simple.websocket.min.js" />
+    <Compile Include="static\js\socket.io.min.js" />
+    <Content Include="views\mains\textchat.ejs" />
+    <Content Include="views\menus\initialmenu.ejs" />
+    <Content Include="views\topnavbar.ejs">
+      <SubType>Code</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="app" />
+    <Folder Include="app\models" />
+    <Folder Include="config" />
+    <Folder Include="iisnode" />
+    <Folder Include="locales" />
+    <Folder Include="setup" />
+    <Folder Include="static" />
+    <Folder Include="static\css" />
+    <Folder Include="static\js" />
+    <Folder Include="views" />
+    <Folder Include="views\mains" />
+    <Folder Include="views\menus" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:48022/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>
