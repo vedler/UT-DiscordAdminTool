@@ -1,0 +1,90 @@
+﻿<!doctype html>
+<html>
+<head>
+    <title>Node Authentication</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <style>
+        body         { padding-top:80px; word-wrap:break-word; }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <div class="page-header text-center">
+            <h1>All users</h1>
+            <% if (stats.numOfUsers) { %>
+            <strong>Total number of users: </strong><%= stats.numOfUsers %><br>
+            <% } %>
+            <a href="/logout" class="btn btn-default btn-sm">Logout</a>
+        </div>
+
+        <% for (var i=0; i < users.length; i++) { %>
+            <div class="row">
+
+                <!-- LOCAL INFORMATION -->
+                <div class="col-sm-6">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="well">
+                                <h3><span class="fa fa-user"></span> Local</h3>
+
+                                <p>
+                                    <strong>id</strong>: <%= users[i]._id %><br>
+                                    <strong>username</strong>: <%= users[i].local.username %><br>
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="well">
+                                <h3><span class="fa fa-gears"></span> Add servers</h3>
+
+                                    <div class="control-group">
+                                        <form action="/add-guild-access" method="post" class="dat-servaccess-form">
+                                            <select name="guild">
+                                                <% servers.forEach(function (server) { %>
+                                                    <option value="<%= server.id %>"><%= server.name %> (<%= server.id %>)</option>
+                                                <% }); %>  
+                                            </select>
+                                            <select name="level">
+                                                <option value="0" selected="selected">0 - Access</option>
+                                                <option value="1">1 - Mod</option>
+                                                <option value="2">2 - Admin</option>
+                                                <option value="3">3 - Owner</option>
+                                            </select>
+                                            <input type="hidden" value="<%= users[i]._id %>" name="userId" />
+                                            <input class="dat-servaccess-button" type="submit" value="Add">
+                                        </form>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FACEBOOK INFORMATION -->
+                <div class="col-sm-6">
+                    <div class="well">
+                        <h3 class="text-primary"><span class="fa fa-facebook"></span> Facebook</h3>
+                        <p>
+                            <strong>id</strong>: asd<br>
+                            <strong>token</strong>: asd<br>
+                            <strong>email</strong>: asd<br>
+                            <strong>name</strong>: asd<br>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../static/js/jquery.min.js">\x3C/script>')</script>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/jquery.msie-bwcompat.js"></script>
+    <script src="../static/js/jquery.ba-bbq.min.js"></script>
+    <script src="../static/js/ejs.min.js"></script>
+    <script src="../static/js/adminajaxhandler.js"></script>
+</body>
+</html>

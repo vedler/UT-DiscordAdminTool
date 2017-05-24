@@ -19,7 +19,6 @@ $(function () {
         var text = $('.dat-input-button').val();
 
         console.log("ayy: " + text);
-
     });
 
     var UpdateMessages = function (parameters) {

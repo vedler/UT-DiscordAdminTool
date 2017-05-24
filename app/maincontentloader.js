@@ -2,7 +2,7 @@
 
 module.exports = function (app, passport, path, fs) {
 
-    this.getMainContentTemplate = function (pageAction) {
+    this.getMainContentTemplate = function (pageAction, user) {
 
         switch (pageAction) {
             case 'joinChannel':
@@ -18,82 +18,26 @@ module.exports = function (app, passport, path, fs) {
         });
     }
 
-    this.getMainContentData = function (pageAction, dataContext) {
+    this.getMainContentData = function (pageAction, dataContext, user, next) {
 
         // Based on pageAction and dataContext, load new data
         if (pageAction == 'joinChannel') {
-            return fetchMessages(dataContext);
-        } else {
-            return returnEmptyPromise();
-        }
 
-        
-        
-        /*
-        if (pageAction == 'joinChannel') {
-            var data = new Object();
-            var chatMessages = [];
+            getUserGuildAccessLevel(user, dataContext, function (err, level) {
+                if (err) {
+                    console.error(err);
+                    return next(null, returnEmptyPromise());
+                } else {
+                    if (user.globalAdmin || level > -1) {
 
-            for (var i = 0; i < 8; i++) {
-                chatMessages[i].sender = "vedler" + i;
-                chatMessages[i].message = "See on üks hea pikk test message." + i;
-            }
-
-            data.chatMessages = chatMessages;
-            return data;
-        } else {
-            return getDefaultMenuData();
-        }*/
-
-        
-        /*var data = new Object();
-        var menuMainButtons = [];
-
-        switch (pageAction) {
-
-            case 'joinServer':
-
-                if (dataContext == '') {
-                    // TODO: Could also append to data here
-                    return getDefaultMenuData();
-                }
-
-                var guild = findClientGuild(dataContext);
-
-                // Guild not found
-                if (typeof guild === 'undefined') {
-                    return getDefaultMenuData();
-                }
-
-                for (var [id, channel] of guild.channels.entries()) {
-
-                    // Text only for now
-                    if (channel.type != 'text') {
-                        continue;
+                        return next(null, fetchMessages(dataContext));
+                    } else {
+                        return next(null, returnEmptyPromise());
                     }
-
-                    var button = new Object();
-
-                    button.targetaction = "joinChannel";
-                    button.datacontext = channel.id;
-                    button.textcontent = "#" + channel.name;
-
-                    menuMainButtons.push(button);
                 }
-
-                break;
-            case 'joinChannel':
-                // TODO
-                return getDefaultMenuData();
-            //break;
-
-            default:
-                // Unknown action
-                return getDefaultMenuData();
+            });
+        } else {
+            return next(null, returnEmptyPromise());
         }
-
-
-        data.menuMainButtons = menuMainButtons;
-        return data;*/
     }
 }

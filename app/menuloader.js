@@ -2,7 +2,7 @@
 
 module.exports = function (app, passport, path, fs) {
 
-	this.getMenuTemplate = function (pageAction) {
+	this.getMenuTemplate = function (pageAction, user) {
         
         switch (pageAction) {
             default:
@@ -10,7 +10,7 @@ module.exports = function (app, passport, path, fs) {
         }
     }
 
-    this.getDefaultMenuData = function() {
+    this.getDefaultMenuData = function(user, next) {
         var data = new Object();
         var menuMainButtons = [];
 
@@ -21,22 +21,45 @@ module.exports = function (app, passport, path, fs) {
         console.log("got list: " + servers);
 
         if (servers) {
-            servers.forEach(function(server) {
-                var button = new Object();
+            getUserGuilds(user, function (error, guilds) {
 
-                button.targetaction = "joinServer";
-                button.datacontext = server.id;
-                button.textcontent = server.name;
+                console.log("Got user guilds: " + JSON.stringify(guilds));
+                console.log("User stats: " + user);
+                console.log("GA: " + user.globalAdmin);
 
-                menuMainButtons.push(button);
+                if (error) {
+                    console.error(error);
+
+                    data.menuMainButtons = menuMainButtons;
+                    return next(error, data);
+                } else {
+                    servers.forEach(function (server) {
+                        var button = new Object();
+
+                        // Check if user has access to the Guild
+                        if (user.globalAdmin || (guilds.hasOwnProperty(server.id) && guilds[server.id] > -1)) {
+                            button.targetaction = "joinServer";
+                            button.datacontext = server.id;
+                            button.textcontent = server.name;
+
+                            menuMainButtons.push(button);
+                        }
+                    });
+
+                    data.menuMainButtons = menuMainButtons;
+                    return next(null, data);
+                }
             });
         }
+        
 
         data.menuMainButtons = menuMainButtons;
         return data;
     }
 
-    this.getMenuData = function (pageAction, dataContext) {
+    this.getMenuData = function (pageAction, dataContext, user, next) {
+
+        // TODO: IMPLEMENT ASYNC BEHAVIOUR!!!!
 
         // Based on pageAction and dataContext, load new data
 
@@ -49,45 +72,111 @@ module.exports = function (app, passport, path, fs) {
 
                 if (dataContext == '') {
                     // TODO: Could also append to data here
-                    return getDefaultMenuData();
+                    return getDefaultMenuData(user, next);
                 }
 
                 var guild = findClientGuild(dataContext);
 
+                console.log("Serv data: " + JSON.stringify(guild));
+
                 // Guild not found
                 if (typeof guild === 'undefined') {
-                    return getDefaultMenuData();
+                    return getDefaultMenuData(user, next);
                 }
 
-                for (var [id, channel] of guild.channels.entries()) {
+                // Check if user has access to this guild
+                getUserGuildAccessLevel(user, guild.id, function (err, level) {
+                    if (err) {
+                        console.error(err);
+                        return getDefaultMenuData(user, next)
+                    } else {
+                        if (user.globalAdmin || level > -1) {
+                            for (var [id, channel] of guild.channels.entries()) {
 
-                    // Text only for now
-                    if (channel.type != 'text') {
-                        continue;
+                                // Text only for now
+                                if (channel.type != 'text') {
+                                    continue;
+                                }
+
+                                var button = new Object();
+
+                                button.targetaction = "joinChannel";
+                                button.datacontext = channel.id;
+                                button.textcontent = "#" + channel.name;
+
+                                menuMainButtons.push(button);
+                            }
+
+                            data.menuMainButtons = menuMainButtons;
+                            return next(null, data);
+                        } else {
+                            return getDefaultMenuData(user, next);
+                        }
                     }
-
-                    var button = new Object();
-
-                    button.targetaction = "joinChannel";
-                    button.datacontext = channel.id;
-                    button.textcontent = "#" + channel.name;
-
-                    menuMainButtons.push(button);
-                }
+                });
 
                 break;
             case 'joinChannel':
-                // TODO
-                return getDefaultMenuData();
-                //break;
+
+                if (dataContext == '') {
+                    // TODO: Could also append to data here
+                    return getDefaultMenuData(user, next);
+                }
+
+                var channel = findClientGuildChannel(dataContext);
+
+                // Guild not found
+                if (!channel || channel == undefined) {
+                    console.log("Channel " + dataContext + " not found.");
+                    return getDefaultMenuData(user, next);
+                }
+
+                // Check if user has access to this guild
+                getUserGuildAccessLevel(user, channel.guild.id, function (err, level) {
+                    if (err) {
+                        console.error(err);
+                        return getDefaultMenuData(user, next);
+                    } else {
+                        if (user.globalAdmin || level > -1) {
+                            for (var [id, parentChannel] of channel.guild.channels.entries()) {
+
+                                // Text only for now
+                                if (parentChannel.type != 'text') {
+                                    continue;
+                                }
+
+                                var button = new Object();
+
+                                button.targetaction = "joinChannel";
+                                button.datacontext = parentChannel.id;
+
+                                // Make the current active channel be bold
+                                if (parentChannel.id == channel.id) {
+                                    button.textcontent = "<b>#" + parentChannel.name + "</b>";
+                                } else {
+                                    button.textcontent = "#" + parentChannel.name;
+                                }
+
+                                menuMainButtons.push(button);
+                            }
+
+                            data.menuMainButtons = menuMainButtons;
+                            return next(null, data);
+                        } else {
+                            return getDefaultMenuData(user, next);
+                        }
+                    }
+                });
+
+                break;
             
             default:
                 // Unknown action
-                return getDefaultMenuData();
+                return getDefaultMenuData(user, next);
         }
         
         
-		data.menuMainButtons = menuMainButtons;
-		return data;
+		//data.menuMainButtons = menuMainButtons;
+		//return data;
 	}
 }

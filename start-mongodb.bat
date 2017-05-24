@@ -1,1 +1,1 @@
-"C:\Program Files\MongoDB\Server\3.4\bin\mongod.exe" --dbpath "C:\UT-DAT\mongodb\data"
+"C:\Program Files\MongoDB\Server\3.4\bin\mongod.exe" --dbpath "C:\UT-DAT\mongodb\data" > mongodb.log 2>&1

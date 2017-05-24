@@ -1,0 +1,6 @@
+<!-- XML eest ka punkte tarvis-->
+
+<dbconfig>
+  <mongopath>C:\Program Files\MongoDB\Server\3.4\bin\mongod.exe</mongopath>
+  <dbpath>C:\UT-DAT\mongodb\data</dbpath>
+</dbconfig>

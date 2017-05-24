@@ -13,6 +13,9 @@
 
     <div class="page-header text-center">
         <h1>Profile Page</h1>
+        <% if (stats.numOfUsers) { %>
+        <strong>Total number of users: </strong><%= stats.numOfUsers %><br>
+        <% } %>
         <a href="/logout" class="btn btn-default btn-sm">Logout</a>
     </div>
 
@@ -25,21 +28,9 @@
 
                 <p>
                     <strong>id</strong>: <%= user._id %><br>
-                    <strong>email</strong>: <%= user.local.username %><br>
+                    <strong>username</strong>: <%= user.local.username %><br>
                     <strong>password</strong>: <%= user.local.password %>
                 </p>
-
-                <!--<% if (user.local.username) { %>
-                    <p>
-                        <strong>id</strong>: <%= user._id %><br>
-                        <strong>email</strong>: <%= user.local.username %><br>
-                        <strong>password</strong>: <%= user.local.password %>
-                    </p>
-                    
-                    <a href="/unlink/local" class="btn btn-default">Unlink</a>
-                <% } else { %>
-                    <a href="/connect/local" class="btn btn-default">Connect Local</a>
-                <% } %>-->
 
             </div>
         </div>
@@ -65,9 +56,6 @@
             </div>
         </div>
     </div>
-
-    
-
 </div>
 </body>
 </html>

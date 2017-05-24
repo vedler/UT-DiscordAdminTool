@@ -10,23 +10,40 @@ module.exports = function(app, Discord, bot, io) {
         return Array.from(bot.guilds.values());
     }
 
-    this.findClientGuild = function(id) {
-        if (!bot.guilds.has(id)) {
+    this.findClientGuild = function(gId) {
+        if (!bot.guilds.has(gId)) {
             return null;
         }
 
-        return bot.guilds.get(id);
+        return bot.guilds.get(gId);
+    }
+
+    this.findClientGuildChannel = function (chId) {
+
+        // We need to get the channel from guilds, because we need the GuildChannel subclass object
+
+        for (var [id, guild] of bot.guilds.entries()) {
+
+            for (var [cid, channel] of guild.channels.entries()) {
+                if (cid == chId && channel.type == 'text') {
+                    return channel;
+                }
+            }
+        }
+
+        return null;
     }
 
     this.fetchMessages = function (channelId) {
 
         console.log("Fecthin channel messages: " + channelId);
 
-        if (!bot.channels.has(channelId)) {
+        var channel = findClientGuildChannel(channelId);
+
+        if (channel == null) {
             return returnEmptyPromise();
         }
-
-        var channel = bot.channels.get(channelId);
+        
         console.log("msg ch: " + channel);
 
         if (channel.type != 'text') {

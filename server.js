@@ -8,6 +8,7 @@ var express = require('express');
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var expressValidator = require('express-validator');
 var morgan = require('morgan');
 var i18n = require('i18n');
 var app = express();
@@ -18,6 +19,26 @@ var fs = require('fs');
 
 var passport = require('passport');
 var flash = require('connect-flash');
+
+
+// ---- Start DB ----
+var parser = require('xml2json');
+var exec = require('child_process').exec;
+
+var filedata = fs.readFileSync('./config/mongoconfig.xml');
+
+console.log(filedata);
+
+var jsonConfig = JSON.parse(parser.toJson(filedata));
+
+console.log(jsonConfig);
+
+var cmd = "\"" + jsonConfig.dbconfig.mongopath + "\" --dbpath \"" + jsonConfig.dbconfig.dbpath + "\" > mongodb.log 2>&1";
+console.log("Starting db with cmd: " + cmd);
+
+exec(cmd);
+
+// ------------------
 
 // configuration 
 
@@ -33,6 +54,8 @@ app.use('/static', express.static(path.join(__dirname, 'static')))
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+app.use(bodyParser.json());
+app.use(expressValidator());
 
 i18n.configure({
     // setup some locales - other locales default to en silently
@@ -44,8 +67,6 @@ i18n.configure({
     // where to store json files - defaults to './locales'
     directory: __dirname + '/locales'
 });
-
-app.use(bodyParser.json());
 
 app.set('view engine', 'ejs'); // set up ejs for templating
 
@@ -65,7 +86,7 @@ app.use(i18n.init);
 
 // routes 
 require('./app/globalparams.js')(app, passport, i18n);
-require('./app/routes.js')(app, passport, ejs, fs); // load our routes and pass in our app and fully configured passport
+require('./app/routes.js')(app, passport, ejs, fs, expressValidator); // load our routes and pass in our app and fully configured passport
 
 require('./app/menuloader.js')(app, passport, path, fs);
 require('./app/maincontentloader.js')(app, passport, path, fs);
@@ -115,4 +136,4 @@ console.log('The magic happens on port ' + port);
 if (AuthDetails.bot_token) {
     console.log("logging in with token");
     bot.login(AuthDetails.bot_token);
-} 
+}
