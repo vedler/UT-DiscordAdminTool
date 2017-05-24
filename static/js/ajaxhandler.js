@@ -21,35 +21,6 @@ $(function () {
     //    console.log("ayy: " + text);
     //});
 
-    $('.dat-servmsg-form').submit(function (e) {
-
-        $.ajax({
-            type: "POST",
-            url: "/send-chat-message",
-            data: $(this).serialize(),
-            success: function (data) {
-
-                /*if (data.hasOwnProperty('error')) {
-                    //alert("Error while sending msg: " + data.error);
-                } else {
-                    alert("Message sent!");
-                }*/
-                console.log(data);
-            }
-        });
-        //e.stopImmediatePropagation();
-        //e.preventDefault(); // avoid to execute the actual submit of the form.
-
-        var parameters = {
-            pageAction: sessionStorage['contextPageAction'],
-            dataContext: sessionStorage['contextDataContext']
-        };
-
-        //UpdateMessages(parameters);
-
-        return false;
-    });
-
     var UpdateMessages = function (parameters) {
         $.get('/ajax-get-maincontent', parameters, function (result) {
 
