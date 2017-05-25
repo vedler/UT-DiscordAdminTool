@@ -114,6 +114,66 @@ module.exports = function (app, passport, ejs, fs, expressValidator, bot, dlib) 
             });
         }
     });
+
+    app.get('/allservers', checkAuthWithReturn, function (req, res) {
+
+        var _stats = {};
+
+        if (isUserRootAdmin(req.user)) {
+
+            getGuildPopulatedAccess(function (err, dbGuilds) {
+
+                var botGuilds = getDiscordBotServerList();
+
+                var servers = [];
+
+                if (!err) {
+                    botGuilds.forEach(function (botGuild) {
+
+                        var rusers = [];
+
+                        dbGuilds.forEach(function (dbGuild) {
+                            if (dbGuild.guildId == botGuild.id) {
+
+                                var user = {
+                                    id: dbGuild.userId._id,
+                                    name: dbGuild.userId.local.username,
+                                    level: dbGuild.level
+                                }
+
+                                rusers.push(user);
+                            }
+                        });
+
+                        var server = {
+                            guildName: botGuild.name,
+                            guildId: botGuild.id,
+                            users: rusers
+                        }
+
+                        console.log("Serv: " + JSON.stringify(server));
+
+                        servers.push(server);
+                    });
+                } else {
+                    console.log(err);
+                }
+
+                console.log("Servers: " + JSON.stringify(servers));
+
+                res.render('allservers.ejs', {
+                    servers: servers
+                });
+
+            });
+            
+
+        } else {
+            res.render('allservers.ejs', {
+                servers: []
+            });
+        }
+    });
     
     app.post('/send-chat-message', checkAuth, function (req, res) {
         req.checkBody('channelId', 'Invalid CHID').notEmpty().isInt();

@@ -219,7 +219,7 @@ module.exports = function (passport) {
     this.getAllUsers = function (next) {
 
         User.find().lean(true).exec(function (err, users) {
-            console.log(users);
+
             if (err) {
                 return next(err, null);
             } else {
@@ -227,6 +227,17 @@ module.exports = function (passport) {
             }
         });
 
+    }
+
+    this.getGuildPopulatedAccess = function (next) {
+
+        GuildAccess.find().populate('userId').exec(function (err, accesses) {
+            if (err) {
+                return next(err, null);
+            } else {
+                return next(null, accesses);
+            }
+        });
     }
 
     // Use a serial control execution

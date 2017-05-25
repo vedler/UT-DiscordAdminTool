@@ -16,6 +16,9 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
+    <Compile Include="views\allservers.ejs">
+      <SubType>Code</SubType>
+    </Compile>
     <Content Include="config\mongoconfig.xml" />
     <Content Include="robots.txt" />
     <Content Include="HTMLPage.html" />
